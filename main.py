@@ -11,6 +11,7 @@ app = FastAPI()
 app.include_router(id_router)
 app.include_router(users_router)
 
+
 @app.get("/")
 async def hello_world():
     return {"message": "Hello World"}
@@ -19,8 +20,6 @@ async def hello_world():
 @app.get("/hello/{name}")
 async def say_hello(name: str):
     return {"message": f"Hello {name}"}
-
-
 
 
 if __name__ == "__main__":
