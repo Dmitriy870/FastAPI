@@ -1,4 +1,3 @@
-from black.linegen import partial
 from sqlalchemy import Select
 from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -29,15 +28,18 @@ async def create_product(session: AsyncSession, new_product: ProductCreate) -> P
 async def update_product(
     session: AsyncSession,
     product: Product,
-    upd_product: ProductUpdate | ProductPartialUpdate,
+    product_update: ProductUpdate | ProductPartialUpdate,
     partial: bool = False,
 ) -> Product:
-    for name, value in upd_product.model_dump(exclude_unset=partial).items():
+    for name, value in product_update.model_dump(exclude_unset=partial).items():
         setattr(product, name, value)
     await session.commit()
     return product
 
 
- async def delete_product(session :AsyncSession ,product : Product) -> None:
-     await session.delete(product)
-     await session.commit()
+async def delete_product(
+    session: AsyncSession,
+    product: Product,
+) -> None:
+    await session.delete(product)
+    await session.commit()
