@@ -2,11 +2,12 @@ from contextlib import asynccontextmanager
 
 import uvicorn
 from fastapi import FastAPI
-from pydantic import BaseModel, EmailStr
 
+from api_v1 import router as api_v1_router
+from core.config import settings
+from core.models import Base, db_helper
 from id_views import router as id_router
 from users.views import router as users_router
-from core.models import Base, db_helper
 
 
 @asynccontextmanager
@@ -21,6 +22,7 @@ app = FastAPI(lifespan=lifespan)
 
 app.include_router(id_router)
 app.include_router(users_router)
+app.include_router(api_v1_router, prefix=settings.api_v1_prefix)
 
 
 @app.get("/")
