@@ -10,4 +10,4 @@ class Profile(Base, UserRelationMixin):
         String(20),  # Ограничивает длинну строки
     )  # mapped_column(unique=True) - уникальность
     last_name: Mapped[str | None] = mapped_column(String(20))
-    bio: Mapped[str]
+    bio: Mapped[str | None]
