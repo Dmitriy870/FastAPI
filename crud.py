@@ -1,8 +1,8 @@
 import asyncio
 
-from sqlalchemy import select
+from sqlalchemy import select, Result
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, selectinload
 
 from core.models import User, db_helper, Profile, Post
 
@@ -55,12 +55,55 @@ async def create_posts(session: AsyncSession, user_id: int, *posts_titles: str):
     return posts
 
 
+async def users_with_posts(session: AsyncSession):
+    statement = (
+        select(User).options(selectinload(User.posts)).order_by(User.id)
+    )  # selectinload используется при подключении 1 к многим ,нет необходимости использовать unique
+    result: Result = await session.execute(
+        statement
+    )  # joinload используется при подключении 1 к 1 или 1 к многим,для избежания повторов необходим unique
+    users = result.scalars()
+    for user in users:
+        print("**" * 10)
+        print(user)
+        for post in user.posts:
+            print(post)
+
+
+async def posts_with_authors(session: AsyncSession):
+    statement = select(Post).options(joinedload(Post.user)).order_by(Post.user_id)
+    posts = await session.scalars(statement)
+    for post in posts:
+        print("Post:", post)
+        print("Author:", post.user)
+
+
+async def get_users_with_posts_and_profiles(
+    session: AsyncSession,
+):
+    stmt = (
+        select(User)
+        .options(
+            joinedload(User.profile),
+            selectinload(User.posts),
+        )
+        .order_by(User.id)
+    )
+    users = await session.scalars(stmt)
+
+    for user in users:  # type: User
+        print("**" * 10)
+        print(user, user.profile and user.profile.first_name)
+        for post in user.posts:
+            print("-", post.title)
+
+
 async def main():
     async with db_helper.session_factory() as session:
         # await create_new_user(session=session, username="jon")
         # await create_new_user(session=session, username="Dima")
-        user_jon = await get_user_by_username(session, "jon")
-        user_jonk = await get_user_by_username(session, "jonk")
+        # user_jon = await get_user_by_username(session, "jon")
+        # user_jonk = await get_user_by_username(session, "jonk")
         # await create_user_profile(
         #     session=session,
         #     user_id=3,
@@ -75,14 +118,16 @@ async def main():
         #     last_name="Die",
         #     bio="I am man ",
         # )
-        await show_users_with_profiles(session=session)
-
-        await create_posts(
-            session,
-            user_jon.id,
-            "SQLA 2.0",
-            "SQLA Joins",
-        )
+        # await show_users_with_profiles(session=session)
+        #
+        # await create_posts(
+        #     session,
+        #     3,
+        #     "posgres",
+        # )
+        # await users_with_posts(session=session)
+        # await posts_with_authors(session=session)
+        await get_users_with_posts_and_profiles(session=session)
 
 
 if __name__ == "__main__":
