@@ -106,7 +106,6 @@ async def create_order(
 
     session.add(order)
     await session.commit()
-
     return order
 
 
@@ -149,14 +148,14 @@ async def demo_m2m(session: AsyncSession):
         price=299,
     )
 
-    order_one = await session.scalar(
+    order_one: Order = await session.scalar(
         select(Order)
         .where(Order.id == order_one.id)
         .options(
             selectinload(Order.products),
         ),
     )
-    order_promo = await session.scalar(
+    order_promo: Order = await session.scalar(
         select(Order)
         .where(Order.id == order_promo.id)
         .options(
@@ -174,36 +173,36 @@ async def demo_m2m(session: AsyncSession):
     await session.commit()
 
 
-# async def main_rel():
-# async with db_helper.session_factory() as session:
-#     # await create_new_user(session=session, username="jon")
-#     # await create_new_user(session=session, username="Dima")
-#     # user_jon = await get_user_by_username(session, "jon")
-#     # user_jonk = await get_user_by_username(session, "jonk")
-#     # await create_user_profile(
-#     #     session=session,
-#     #     user_id=3,
-#     #     first_name="Dima",
-#     #     last_name="Pilevich",
-#     #     bio="I am ",
-#     # )
-#     # await create_user_profile(
-#     #     session=session,
-#     #     user_id=user_jon.id,
-#     #     first_name="Jonk",
-#     #     last_name="Die",
-#     #     bio="I am man ",
-#     # )
-#     # await show_users_with_profiles(session=session)
-#     #
-#     # await create_posts(
-#     #     session,
-#     #     3,
-#     #     "posgres",
-#     # )
-#     # await users_with_posts(session=session)
-#     # await posts_with_authors(session=session)
-#     await get_users_with_posts_and_profiles(session=session)
+async def main_():
+    async with db_helper.session_factory() as session:
+        # await create_new_user(session=session, username="Vlad")
+        # await create_new_user(session=session, username="Dima")
+        # user_jon = await get_user_by_username(session, "jon")
+        # await create_user_profile(
+        #     session=session,
+        #     user_id=3,
+        #     first_name="Dima",
+        #     last_name="Pilevich",
+        #     bio="I am ",
+        # )
+        # await create_user_profile(
+        #     session=session,
+        #     user_id=user_jon.id,
+        #     first_name="Jonk",
+        #     last_name="Die",
+        #     bio="I am man ",
+        # )
+        # await show_users_with_profiles(session=session)
+        #
+        # await create_posts(
+        #     session,
+        #     3,
+        #     "posgres",
+        # )
+        # await users_with_posts(session=session)
+        # await posts_with_authors(session=session)
+        # await get_users_with_posts_and_profiles(session=session)
+        await users_with_posts(session)
 
 
 async def main():

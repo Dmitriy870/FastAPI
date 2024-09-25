@@ -1,13 +1,17 @@
-from sqlalchemy import Table, Column, ForeignKey, Integer, UniqueConstraint
-from core.models import Base
-import sqlalchemy as sa
-from alembic import op
+from sqlalchemy import ForeignKey, UniqueConstraint
+from sqlalchemy.orm import Mapped, mapped_column
 
-order_product_association_table = Table(
-    "OrderProductAssociationTable",
-    Base.metadata,
-    Column("id", Integer, primary_key=True),
-    Column("product_id", ForeignKey("product.id"), nullable=False, unique=True),
-    Column("order_id", ForeignKey("order.id"), nullable=False, unique=True),
-    UniqueConstraint("product_id", "order_id", name="index_unique_prod_order"),
-)
+from core.models import Base
+
+
+class OrderProductAssociation(Base):
+    __tablename__ = "order_product_association"
+
+    __table_args__ = (
+        UniqueConstraint("order_id", "product_id", name="index_unique_product_order"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    order_id: Mapped[int] = mapped_column(ForeignKey("order.id"))
+    product_id: Mapped[int] = mapped_column(ForeignKey("product.id"))
+    count: Mapped[int] = mapped_column(default=1)
